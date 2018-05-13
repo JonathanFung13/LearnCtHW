@@ -4,9 +4,11 @@
 #include <errno.h>
 #include <string.h>
 
+// CPP to create these constants reliably
 #define MAX_DATA 512
 #define MAX_ROWS 100
 
+// Address struct of fixed size (less efficient, but easy to store and read)
 struct Address {
 	int id;
 	int set;
@@ -14,24 +16,26 @@ struct Address {
 	char email[MAX_DATA];
 };
 
+// Another fixed size struct
 struct Database {
 	struct Address rows[MAX_ROWS];
 };
 
 struct Connection {
-	FILE *file;
+	FILE *file;  // standard file struct
 	struct Database *db;
 };
 
+// die function to abort with an error
 void die(const char *message)
 {
-	if (errno) {
-		perror(message);
+	if (errno) { // errno is an external variable to say what has happened
+		perror(message); // prints the error message
 	} else {
-		printf("ERROR: %s\n", message);
+		printf("ERROR: %s\n", message); // if no errno print custom message
 	}
 
-	exit(1);
+	exit(1); // exit the program
 }
 
 void Address_print(struct Address *addr)
@@ -49,7 +53,7 @@ void Database_load(struct Connection *conn)
 struct Connection *Database_open(const char *filename, char mode)
 {
 	struct Connection *conn = malloc(sizeof(struct Connection));
-	if (!conn)
+	if (!conn) // equivalent to if(conn == NULL)
 		die("Memory error");
 
 	conn->db = malloc(sizeof(struct Database));
@@ -85,7 +89,7 @@ void Database_close(struct Connection *conn)
 
 void Database_write(struct Connection *conn)
 {
-	rewind(conn->file);
+	rewind(conn->file); // moves file position indicator to the beginning
 
 	int rc = fwrite(conn->db, sizeof(struct Database), 1, conn->file);
 	if (rc != 1)
@@ -129,7 +133,7 @@ void Database_set(struct Connection *conn, int id, const char *name,
 
 void Database_get(struct Connection *conn, int id)
 {
-	struct Address *addr = &conn->db->rows[id];
+	struct Address *addr = &conn->db->rows[id]; // nested struct returns address
 
 	if (addr->set) {
 		Address_print(addr);
@@ -140,6 +144,8 @@ void Database_get(struct Connection *conn, int id)
 
 void Database_delete(struct Connection *conn, int id)
 {
+	// create a temporary address ensure all fields but id and set are 0
+	// then copy it into the database
 	struct Address addr = {.id = id, .set=0 };
 	conn->db->rows[id] = addr;
 }
@@ -168,7 +174,7 @@ int main(int argc, char *argv[])
 	struct Connection *conn = Database_open(filename, action);
 	int id = 0;
 
-	if (argc > 3) id = atoi(argv[3]);
+	if (argc > 3) id = atoi(argv[3]); // convert the 3 arg from string to an integer
 	if (id >= MAX_ROWS) die("There's not that many records.");
 
 	switch (action) {
