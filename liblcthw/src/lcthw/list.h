@@ -1,7 +1,6 @@
 //
 // Created by jonathan on 2019-08-12.
 //
-
 #ifndef lcthw_List_h
 #define lcthw_List_h
 

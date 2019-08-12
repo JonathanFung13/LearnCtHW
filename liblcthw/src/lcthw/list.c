@@ -2,7 +2,7 @@
 // Created by jonathan on 2019-08-12.
 //
 #include <lcthw/list.h>
-#include <lcthw/dbg.h>
+#include "dbg.h"
 
 List *List_create()
 {
