@@ -24,6 +24,7 @@
 
 # Compiled Dynamic libraries
 *.so
+!libex29.so
 *.dylib
 *.dll
 
