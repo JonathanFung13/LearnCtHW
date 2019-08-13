@@ -2,7 +2,7 @@
 #include <dlfcn.h>
 
 typedef int (*lib_function) (const char *data);
-char *lib_file = "build/libex29.so";
+char *lib_file = "build/libYOUR_LIBRARY.so";
 void *lib = NULL;
 
 int check_function(const char *func_to_run, const char *data,
@@ -18,7 +18,6 @@ int check_function(const char *func_to_run, const char *data,
           func_to_run, rc, data);
 
     return 1;
-
 
 error:
     return 0;
