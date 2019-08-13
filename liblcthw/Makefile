@@ -25,15 +25,15 @@ $(TARGET): build $(OBJECTS)
 $(SO_TARGET): $(TARGET) $(OBJECTS)
 	$(CC) -shared -o $@ $(OBJECTS)
 
-####
+build:
+	@mkdir -p build
+	@mkdir -p bin
+
+#### UGLINESS
 TESTS_DIR=./tests
 $(TESTS_DIR)/%: $(TESTS_DIR)/%.c
 	cc $< $(CFLAGS) -o $@
 ####
-
-build:
-	@mkdir -p build
-	@mkdir -p bin
 
 # The Unit Tests
 .PHONY: tests
