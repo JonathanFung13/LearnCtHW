@@ -1,5 +1,5 @@
 CFLAGS=-g -O2 -Wall -Wextra -Isrc -rdynamic -DNDEBUG $(OPTFLAGS)
-LIBS=-ldl $(OPTLIBS)
+LDFLAGS=$(OPTLIBS)
 PREFIX?=/usr/local
 
 SOURCES=$(wildcard src/**/*.c src/*.c)
@@ -9,10 +9,14 @@ TEST_SRC=$(wildcard tests/*_tests.c)
 TESTS=$(patsubst %.c,%,$(TEST_SRC))
 
 TARGET=build/liblcthw.a
-SO_TARGET=$(patsubst %.a,%.so,$(TARGET))
+
+OS=$(shell lsb_release -si)
+ifeq ($(OS),Ubuntu)
+	LDLIBS=-llcthw -lbsd -L./build -lm
+endif
 
 # The Target Build
-all: $(TARGET) $(SO_TARGET) tests
+all: $(TARGET) tests
 
 dev: CFLAGS=-g -Wall -Isrc -Wall -Wextra $(OPTFLAGS)
 dev: all
@@ -22,24 +26,18 @@ $(TARGET): build $(OBJECTS)
 	ar rcs $@ $(OBJECTS)
 	ranlib $@
 
-$(SO_TARGET): $(TARGET) $(OBJECTS)
-	$(CC) -shared -o $@ $(OBJECTS)
-
 build:
 	@mkdir -p build
 	@mkdir -p bin
 
-#### UGLINESS
-TESTS_DIR=./tests
-$(TESTS_DIR)/%: $(TESTS_DIR)/%.c
-	cc $< $(CFLAGS) -o $@
-####
-
 # The Unit Tests
 .PHONY: tests
-tests: CFLAGS += $(TARGET)
+tests: LDLIBS += $(TARGET)
 tests: $(TESTS)
 	sh ./tests/runtests.sh
+
+valgrind:
+	VALGRIND="valgrind --log-file=/tmp/valgrind-%p.log" $(MAKE)
 
 # The Cleaner
 clean:
@@ -56,5 +54,4 @@ install: all
 # The Checker
 check:
 	@echo Files with potentially dangerous functions.
-	@egrep '[^_.>a-zA-Z0-9](str(n?cpy|n?cat|xfrm|n?dup|str|pbrk|tok|_)\
-		  |stpn?cpy|a?sn?printf|byte_)' $(SOURCES) || true
+	@egrep '[^_.>a-zA-Z0-9](str(n?cpy|n?cat|xfrm|n?dup|str|pbrk|tok|_)|stpn?cpy|a?sn?printf|byte_)' $(SOURCES) || true
