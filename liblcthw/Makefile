@@ -10,11 +10,6 @@ TESTS=$(patsubst %.c,%,$(TEST_SRC))
 
 TARGET=build/liblcthw.a
 
-OS=$(shell lsb_release -si)
-ifeq ($(OS),Ubuntu)
-	LDLIBS=-llcthw -L./build -lm
-endif
-
 # The Target Build
 all: $(TARGET) tests
 
@@ -31,6 +26,12 @@ build:
 	@mkdir -p bin
 
 # The Unit Tests
+# https://stackoverflow.com/questions/23851098/c-compile-errors-learn-c-the-hard-way-ex-32/23852082
+OS=$(shell lsb_release -si)
+ifeq ($(OS),Ubuntu)
+	LDLIBS = -llcthw -L./build -lm
+endif
+
 .PHONY: tests
 tests: LDLIBS += $(TARGET)
 tests: $(TESTS)
