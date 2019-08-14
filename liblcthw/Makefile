@@ -12,7 +12,7 @@ TARGET=build/liblcthw.a
 
 OS=$(shell lsb_release -si)
 ifeq ($(OS),Ubuntu)
-	LDLIBS=-llcthw -lbsd -L./build -lm
+	LDLIBS=-llcthw -L./build -lm
 endif
 
 # The Target Build
