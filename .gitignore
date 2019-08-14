@@ -4,8 +4,8 @@
 # Unignore all with extensions
 !*.*
 !Makefile
-#!LICENSE
-
+!LICENSE
+.idea
 # Unignore all directories
 !*/
 
